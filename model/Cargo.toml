@@ -1,9 +1,0 @@
-[package]
-name = "hocg-fan-sim-prices-model"
-edition.workspace = true
-version.workspace = true
-
-[dependencies]
-icu = { workspace = true }
-jiff = { workspace = true }
-serde = { workspace = true }
