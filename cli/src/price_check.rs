@@ -144,13 +144,13 @@ pub fn yuyutei(all_prices: &mut PricesDatabase) {
     let mut url_count = 0;
     let mut url_skipped = 0;
     for (url, price) in urls {
-        let price = Price::new_yen(price);
+        let price = Price::from_yen(price);
         all_prices
-            .entry(ServiceId::new_yuyutei(url.clone()))
+            .entry(ServiceId::from_yuyutei(url.clone()))
             .and_modify(|p| {
                 if p.1 != price {
                     p.0 = Timestamp::now();
-                    p.1 = price.clone();
+                    p.1 = price;
                     url_count += 1;
                 } else {
                     url_skipped += 1;
@@ -222,13 +222,13 @@ pub fn tcgplayer(all_prices: &mut PricesDatabase) {
     let mut product_id_count = 0;
     let mut product_ids_skipped = 0;
     for (product_id, price) in product_ids {
-        let price = Price::new_dollar(price);
+        let price = Price::from_dollar(price);
         all_prices
-            .entry(ServiceId::new_tcgplayer(product_id))
+            .entry(ServiceId::from_tcgplayer(product_id))
             .and_modify(|p| {
                 if p.1 != price {
                     p.0 = Timestamp::now();
-                    p.1 = price.clone();
+                    p.1 = price;
                     product_id_count += 1;
                 } else {
                     product_ids_skipped += 1;

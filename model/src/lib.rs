@@ -1,7 +1,7 @@
 use std::{
     collections::BTreeMap,
     fmt::Display,
-    ops::{Add, Sub},
+    ops::{Add, Mul, Sub},
     str::FromStr,
 };
 
@@ -44,11 +44,11 @@ impl From<ServiceId> for String {
 }
 
 impl ServiceId {
-    pub fn new_yuyutei(url: String) -> Self {
+    pub fn from_yuyutei(url: String) -> Self {
         ServiceId::Yuyutei(url)
     }
 
-    pub fn new_tcgplayer(product_id: u32) -> Self {
+    pub fn from_tcgplayer(product_id: u32) -> Self {
         ServiceId::TcgPlayer(format!("https://www.tcgplayer.com/product/{product_id}"))
     }
 
@@ -60,8 +60,10 @@ impl ServiceId {
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Serialize, Deserialize)]
 pub enum Price {
+    #[serde(rename = "z")]
+    Zero,
     #[serde(rename = "y")]
     Yen(u32),
     #[serde(rename = "d")]
@@ -69,16 +71,17 @@ pub enum Price {
 }
 
 impl Price {
-    pub fn new_yen(price: u32) -> Self {
+    pub fn from_yen(price: u32) -> Self {
         Price::Yen(price)
     }
 
-    pub fn new_dollar(price: f64) -> Self {
+    pub fn from_dollar(price: f64) -> Self {
         Price::Dollar((price * 100.0).round() as u32)
     }
 
     pub fn as_float(&self) -> f64 {
         match self {
+            Price::Zero => 0.0,
             Price::Yen(p) => *p as f64,
             Price::Dollar(p) => *p as f64 / 100.0,
         }
@@ -90,6 +93,7 @@ impl Add for Price {
 
     fn add(self, rhs: Self) -> Self::Output {
         match (self, rhs) {
+            (Price::Zero, p) | (p, Price::Zero) => p,
             (Price::Yen(a), Price::Yen(b)) => Price::Yen(a + b),
             (Price::Dollar(a), Price::Dollar(b)) => Price::Dollar(a + b),
             _ => panic!("cannot add different price types"),
@@ -102,6 +106,8 @@ impl Sub for Price {
 
     fn sub(self, rhs: Self) -> Self::Output {
         match (self, rhs) {
+            (p, Price::Zero) => p,
+            (Price::Zero, _) => Price::Zero,
             (Price::Yen(a), Price::Yen(b)) => Price::Yen(a - b),
             (Price::Dollar(a), Price::Dollar(b)) => Price::Dollar(a - b),
             _ => panic!("cannot subtract different price types"),
@@ -109,9 +115,28 @@ impl Sub for Price {
     }
 }
 
+impl Mul<u32> for Price {
+    type Output = Self;
+
+    fn mul(self, rhs: u32) -> Self::Output {
+        match self {
+            Price::Zero => Price::Zero,
+            Price::Yen(p) => Price::Yen(p * rhs),
+            Price::Dollar(p) => Price::Dollar(p * rhs),
+        }
+    }
+}
+
+impl std::iter::Sum for Price {
+    fn sum<I: Iterator<Item = Self>>(iter: I) -> Self {
+        iter.fold(Price::Zero, |a, b| a + b)
+    }
+}
+
 impl Display for Price {
     fn fmt(&self, fmt: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
+            Price::Zero => write!(fmt, "0"),
             Price::Yen(p) => {
                 let f = DecimalFormatter::try_new(locale!("ja-JP").into(), Default::default())
                     .expect("locale should be present");

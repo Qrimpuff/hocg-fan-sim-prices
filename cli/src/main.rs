@@ -108,12 +108,12 @@ fn main() {
                 .illustrations
                 .iter()
                 .filter_map(|i| i.yuyutei_sell_url.as_ref())
-                .map(|url| ServiceId::new_yuyutei(url.clone()))
+                .map(|url| ServiceId::from_yuyutei(url.clone()))
                 .chain(
                     card.illustrations
                         .iter()
                         .filter_map(|i| i.tcgplayer_product_id)
-                        .map(ServiceId::new_tcgplayer),
+                        .map(ServiceId::from_tcgplayer),
                 )
                 .collect();
 
@@ -127,11 +127,11 @@ fn main() {
                         .entry(service_id)
                         .and_modify(|e| {
                             if e.last() != Some(current_price) {
-                                e.push(current_price.clone());
+                                e.push(*current_price);
                                 e.sort_by_key(|(t, _)| *t);
                             }
                         })
-                        .or_insert_with(|| vec![current_price.clone()]);
+                        .or_insert_with(|| vec![*current_price]);
                 }
             }
         }
