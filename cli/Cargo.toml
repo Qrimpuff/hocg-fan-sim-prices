@@ -1,0 +1,19 @@
+[package]
+name = "hocg-fan-sim-prices-cli"
+edition.workspace = true
+version.workspace = true
+
+[dependencies]
+hocg-fan-sim-prices-model = { workspace = true }
+hocg-fan-sim-assets-model = { workspace = true }
+clap = { workspace = true }
+dotenvy = { workspace = true }
+indexmap = { workspace = true }
+jiff = { workspace = true }
+json-pretty-compact = { workspace = true }
+parking_lot = { workspace = true }
+rayon = { workspace = true }
+reqwest = { workspace = true }
+scraper = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
