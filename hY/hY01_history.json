@@ -13,7 +13,10 @@
   "https://www.tcgplayer.com/product/647480": [ [ "2026-05-10T21:07:04.962125638Z", { "d": 1898 } ] ],
   "https://www.tcgplayer.com/product/658452": [ [ "2026-05-10T21:07:04.962109383Z", { "d": 2586 } ] ],
   "https://www.tcgplayer.com/product/669233": [ [ "2026-05-10T21:07:04.962015452Z", { "d": 872 } ] ],
-  "https://www.tcgplayer.com/product/670609": [ [ "2026-05-10T21:07:04.9621335Z", { "d": 1237 } ] ],
+  "https://www.tcgplayer.com/product/670609": [
+    [ "2026-05-10T21:07:04.9621335Z", { "d": 1237 } ],
+    [ "2026-05-11T21:33:46.715925466Z", { "d": 1221 } ]
+  ],
   "https://www.tcgplayer.com/product/679494": [ [ "2026-05-10T21:07:04.96193385Z", { "d": 2073 } ] ],
   "https://www.tcgplayer.com/product/690153": [ [ "2026-05-10T21:07:04.961853179Z", { "d": 1785 } ] ]
 }
