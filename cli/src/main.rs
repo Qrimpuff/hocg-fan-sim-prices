@@ -1,5 +1,5 @@
 use std::{
-    collections::HashMap,
+    collections::{HashMap, HashSet},
     fs::{self},
     path::{Path, PathBuf},
 };
@@ -11,6 +11,7 @@ use hocg_fan_sim_prices_model::{PricesDatabase, PricesHistoryDatabase, ServiceId
 use json_pretty_compact::PrettyCompactFormatter;
 use serde::Serialize;
 use serde_json::Serializer;
+use walkdir::WalkDir;
 
 /// Scrap hOCG price from Yuyu-tei and TCGplayer
 #[derive(Parser, Debug)]
@@ -59,33 +60,21 @@ fn main() {
         all_prices = serde_json::from_str(&s).unwrap();
     }
 
-    let mut all_prices_history: HashMap<PathBuf, (Option<PricesHistoryDatabase>, Vec<String>)> =
-        HashMap::new();
+    let mut all_prices_history: PricesHistoryDatabase = PricesHistoryDatabase::new();
 
     // load historical prices
-    for (card_number, card) in &all_cards {
-        let set = card_number.split('-').next().unwrap_or_default();
-        let history_file = if card.card_type == CardType::Cheer {
-            prices_path.join(format!("hY/{set}_history.json"))
-        } else {
-            prices_path.join(format!("{set}/{card_number}_history.json"))
-        };
-
-        if let Some(history) = all_prices_history.get_mut(&history_file) {
-            history.1.push(card_number.clone());
-            continue;
-        }
-
-        if !args.clean
-            && let Ok(s) = fs::read_to_string(&history_file)
+    if !args.clean {
+        for entry in WalkDir::new(prices_path)
+            .contents_first(true)
+            .into_iter()
+            .flatten()
+            .filter(|e| e.file_type().is_file())
+            .filter(|e| !e.path().components().any(|c| c.as_os_str() == ".git"))
+            .filter(|e| e.file_name().to_string_lossy().ends_with("_history.json"))
         {
-            let history: PricesHistoryDatabase = serde_json::from_str(&s).unwrap();
-            all_prices_history.insert(
-                history_file.clone(),
-                (Some(history), vec![card_number.clone()]),
-            );
-        } else {
-            all_prices_history.insert(history_file.clone(), (None, vec![card_number.clone()]));
+            let history: PricesHistoryDatabase =
+                serde_json::from_str(&fs::read_to_string(entry.path()).unwrap()).unwrap();
+            all_prices_history.extend(history);
         }
     }
 
@@ -100,40 +89,11 @@ fn main() {
     }
 
     // update historical prices
-    for (history, card_numbers) in all_prices_history.values_mut() {
-        for card_number in card_numbers {
-            let card = all_cards.get(card_number).expect("is set above");
-
-            let service_ids: Vec<_> = card
-                .illustrations
-                .iter()
-                .filter_map(|i| i.yuyutei_sell_url.as_ref())
-                .map(|url| ServiceId::from_yuyutei(url.clone()))
-                .chain(
-                    card.illustrations
-                        .iter()
-                        .filter_map(|i| i.tcgplayer_product_id)
-                        .map(ServiceId::from_tcgplayer),
-                )
-                .collect();
-
-            if !service_ids.is_empty() {
-                let history = history.get_or_insert_default();
-                for service_id in service_ids {
-                    let Some(current_price) = all_prices.get(&service_id) else {
-                        continue;
-                    };
-                    history
-                        .entry(service_id)
-                        .and_modify(|e| {
-                            if e.last() != Some(current_price) {
-                                e.push(*current_price);
-                                e.sort_by_key(|(t, _)| *t);
-                            }
-                        })
-                        .or_insert_with(|| vec![*current_price]);
-                }
-            }
+    for (service, price) in &all_prices {
+        let history = all_prices_history.entry(service.clone()).or_default();
+        if history.last() != Some(price) {
+            history.push(*price);
+            history.sort();
         }
     }
 
@@ -147,17 +107,97 @@ fn main() {
     all_prices.serialize(&mut ser).unwrap();
     fs::write(&prices_mapping_file, json).unwrap();
 
-    // save historical prices
-    for (history_file, (history, _)) in all_prices_history {
-        if let Some(history) = history {
-            if let Some(parent) = history_file.parent() {
-                fs::create_dir_all(parent).unwrap();
+    // split history by card number
+    let mut card_prices_history: HashMap<PathBuf, PricesHistoryDatabase> = HashMap::new();
+    for (card_number, card) in all_cards {
+        let set = card_number.split('-').next().unwrap_or_default();
+        let history_file = if card.card_type == CardType::Cheer {
+            prices_path.join(format!("hY/{set}_history.json"))
+        } else {
+            prices_path.join(format!("{set}/{card_number}_history.json"))
+        };
+
+        let service_ids: Vec<_> = card
+            .illustrations
+            .iter()
+            .filter_map(|i| i.yuyutei_sell_url.as_ref())
+            .map(|url| ServiceId::from_yuyutei(url.clone()))
+            .chain(
+                card.illustrations
+                    .iter()
+                    .filter_map(|i| i.tcgplayer_product_id)
+                    .map(ServiceId::from_tcgplayer),
+            )
+            .collect();
+
+        if !service_ids.is_empty() {
+            let history = card_prices_history.entry(history_file).or_default();
+            for service_id in service_ids {
+                if let Some(price_history) = all_prices_history.remove(&service_id) {
+                    history.insert(service_id, price_history);
+                }
             }
-            let mut json = vec![];
-            let formatter = PrettyCompactFormatter::new();
-            let mut ser = Serializer::with_formatter(&mut json, formatter);
-            history.serialize(&mut ser).unwrap();
-            fs::write(history_file, json).unwrap();
+        }
+    }
+
+    // save historical prices
+    for (history_file, history) in &card_prices_history {
+        if let Some(parent) = history_file.parent() {
+            fs::create_dir_all(parent).unwrap();
+        }
+        let mut json = vec![];
+        let formatter = PrettyCompactFormatter::new();
+        let mut ser = Serializer::with_formatter(&mut json, formatter);
+        history.serialize(&mut ser).unwrap();
+        fs::write(history_file, json).unwrap();
+    }
+
+    // save remainder in a "other_history.json"
+    let other_history_file = prices_path.join("other_history.json");
+    if !all_prices_history.is_empty() {
+        if let Some(parent) = Path::new(&other_history_file).parent() {
+            fs::create_dir_all(parent).unwrap();
+        }
+        let mut json = vec![];
+        let formatter = PrettyCompactFormatter::new();
+        let mut ser = Serializer::with_formatter(&mut json, formatter);
+        all_prices_history.serialize(&mut ser).unwrap();
+        fs::write(&other_history_file, json).unwrap();
+    }
+
+    // delete old history files
+    let mut required_paths = HashSet::from([prices_mapping_file.to_owned()]);
+    required_paths.extend(card_prices_history.keys().cloned());
+    if !all_prices_history.is_empty() {
+        required_paths.insert(other_history_file);
+    }
+    for entry in WalkDir::new(prices_path)
+        .contents_first(true)
+        .into_iter()
+        .flatten()
+        .filter(|e| !e.path().components().any(|c| c.as_os_str() == ".git"))
+    {
+        // keep referenced files
+        if required_paths.contains(entry.path()) {
+            continue;
+        }
+
+        if entry.file_type().is_file() {
+            // remove file
+            println!(
+                "Removing file: {}",
+                entry.path().strip_prefix(prices_path).unwrap().display()
+            );
+            fs::remove_file(entry.path()).unwrap();
+        } else if entry.file_type().is_dir() {
+            // remove folder, if it's empty
+            if entry.path().read_dir().unwrap().next().is_none() {
+                println!(
+                    "Removing empty folder: {}",
+                    entry.path().strip_prefix(prices_path).unwrap().display()
+                );
+                fs::remove_dir(entry.path()).unwrap();
+            }
         }
     }
 
