@@ -3,5 +3,8 @@
   "https://yuyu-tei.jp/sell/hocg/card/promo-hbp10/10035": [ [ "2026-05-10T21:07:03.877483895Z", { "y": 320 } ] ],
   "https://www.tcgplayer.com/product/645699": [ [ "2026-05-10T21:07:04.962175362Z", { "d": 17 } ] ],
   "https://www.tcgplayer.com/product/645700": [ [ "2026-05-10T21:07:04.962175603Z", { "d": 564 } ] ],
-  "https://www.tcgplayer.com/product/654153": [ [ "2026-05-10T21:07:04.962126589Z", { "d": 183 } ] ]
+  "https://www.tcgplayer.com/product/654153": [
+    [ "2026-05-10T21:07:04.962126589Z", { "d": 183 } ],
+    [ "2026-05-14T21:31:23.63055521Z", { "d": 171 } ]
+  ]
 }
