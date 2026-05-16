@@ -1,5 +1,8 @@
 {
   "https://yuyu-tei.jp/sell/hocg/card/hsd05/10011": [ [ "2026-05-10T21:07:03.877643335Z", { "y": 280 } ] ],
-  "https://yuyu-tei.jp/sell/hocg/card/promo-hsd10/10037": [ [ "2026-05-10T21:07:03.877548803Z", { "y": 220 } ] ],
+  "https://yuyu-tei.jp/sell/hocg/card/promo-hsd10/10037": [
+    [ "2026-05-10T21:07:03.877548803Z", { "y": 220 } ],
+    [ "2026-05-16T21:20:32.48703258Z", { "y": 280 } ]
+  ],
   "https://www.tcgplayer.com/product/669000": [ [ "2026-05-13T21:35:26.831329373Z", { "d": 39 } ] ]
 }

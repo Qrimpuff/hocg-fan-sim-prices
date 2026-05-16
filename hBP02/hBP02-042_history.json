@@ -1,6 +1,9 @@
 {
   "https://yuyu-tei.jp/sell/hocg/card/hbp02/10086": [ [ "2026-05-10T21:07:03.877726359Z", { "y": 80 } ] ],
   "https://yuyu-tei.jp/sell/hocg/card/promo-hbp10/10056": [ [ "2026-05-10T21:07:03.877500901Z", { "y": 980 } ] ],
-  "https://www.tcgplayer.com/product/657616": [ [ "2026-05-10T21:07:04.9620741Z", { "d": 32 } ] ],
+  "https://www.tcgplayer.com/product/657616": [
+    [ "2026-05-10T21:07:04.9620741Z", { "d": 32 } ],
+    [ "2026-05-16T21:20:33.808185458Z", { "d": 33 } ]
+  ],
   "https://www.tcgplayer.com/product/671693": [ [ "2026-05-10T21:07:04.962136064Z", { "d": 394 } ] ]
 }
