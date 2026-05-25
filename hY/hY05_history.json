@@ -3,7 +3,10 @@
   "https://yuyu-tei.jp/sell/hocg/card/yell01/10011": [ [ "2026-05-10T21:07:03.877318878Z", { "y": 1780 } ] ],
   "https://yuyu-tei.jp/sell/hocg/card/yell01/10021": [ [ "2026-05-10T21:07:03.877319318Z", { "y": 2980 } ] ],
   "https://yuyu-tei.jp/sell/hocg/card/yell01/10031": [ [ "2026-05-10T21:07:03.877319659Z", { "y": 2980 } ] ],
-  "https://yuyu-tei.jp/sell/hocg/card/yell01/10039": [ [ "2026-05-10T21:07:03.87746723Z", { "y": 3480 } ] ],
+  "https://yuyu-tei.jp/sell/hocg/card/yell01/10039": [
+    [ "2026-05-10T21:07:03.87746723Z", { "y": 3480 } ],
+    [ "2026-05-25T21:29:53.526323762Z", { "y": 3980 } ]
+  ],
   "https://yuyu-tei.jp/sell/hocg/card/yell01/10045": [ [ "2026-05-10T21:07:03.877320029Z", { "y": 1480 } ] ],
   "https://yuyu-tei.jp/sell/hocg/card/yell01/10051": [ [ "2026-05-10T21:07:03.87732039Z", { "y": 1280 } ] ],
   "https://yuyu-tei.jp/sell/hocg/card/yell01/10057": [ [ "2026-05-10T21:07:03.877320801Z", { "y": 1780 } ] ],
