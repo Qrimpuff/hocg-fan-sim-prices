@@ -44,8 +44,8 @@ impl From<ServiceId> for String {
 }
 
 impl ServiceId {
-    pub fn from_yuyutei(url: String) -> Self {
-        ServiceId::Yuyutei(url)
+    pub fn from_yuyutei(sell_path: String) -> Self {
+        ServiceId::Yuyutei(format!("https://yuyu-tei.jp/sell{sell_path}"))
     }
 
     pub fn from_tcgplayer(product_id: u32) -> Self {
