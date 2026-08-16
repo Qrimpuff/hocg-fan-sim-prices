@@ -146,7 +146,7 @@ pub fn yuyutei(all_prices: &mut PricesDatabase) {
     for (url, price) in urls {
         let price = Price::from_yen(price);
         all_prices
-            .entry(ServiceId::from_yuyutei(url.clone()))
+            .entry(ServiceId::Yuyutei(url.clone()))
             .and_modify(|p| {
                 if p.1 != price {
                     p.0 = Timestamp::now();

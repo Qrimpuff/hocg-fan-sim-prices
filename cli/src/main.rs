@@ -120,12 +120,16 @@ fn main() {
         let service_ids: Vec<_> = card
             .illustrations
             .iter()
-            .filter_map(|i| i.yuyutei_sell_url.as_ref())
-            .map(|url| ServiceId::from_yuyutei(url.clone()))
+            .filter_map(|i| i.yuyutei_sell_paths.as_ref())
+            .flatten()
+            .cloned()
+            .map(ServiceId::from_yuyutei)
             .chain(
                 card.illustrations
                     .iter()
-                    .filter_map(|i| i.tcgplayer_product_id)
+                    .filter_map(|i| i.tcgplayer_product_ids.as_ref())
+                    .flatten()
+                    .copied()
                     .map(ServiceId::from_tcgplayer),
             )
             .collect();
