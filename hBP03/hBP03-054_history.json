@@ -1,5 +1,8 @@
 {
-  "https://yuyu-tei.jp/sell/hocg/card/hbp03/10110": [ [ "2026-05-10T21:07:03.877596124Z", { "y": 30 } ] ],
+  "https://yuyu-tei.jp/sell/hocg/card/hbp03/10110": [
+    [ "2026-05-10T21:07:03.877596124Z", { "y": 30 } ],
+    [ "2026-09-16T21:12:35.380758888Z", { "y": 50 } ]
+  ],
   "https://yuyu-tei.jp/sell/hocg/card/hbp03/10111": [ [ "2026-05-10T21:07:03.877803645Z", { "y": 420 } ] ],
   "https://yuyu-tei.jp/sell/hocg/card/promo-hbp10/10156": [
     [ "2026-05-10T21:07:03.877508973Z", { "y": 1980 } ],
